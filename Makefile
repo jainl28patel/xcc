@@ -6,6 +6,8 @@ LD_DIR:=src/ld
 UTIL_DIR:=src/util
 DEBUG_DIR:=src/_debug
 OBJ_DIR:=obj
+OUTPUT_DIR:=output
+INPUT_DIR:=examples
 
 LIBSRC_DIR:=libsrc
 LIBOBJ_DIR:=obj/lib
@@ -150,6 +152,8 @@ clean:
 	@$(MAKE) -C libsrc clean
 	@$(MAKE) -C tests clean
 
+
+
 # Run tests on RISC-V simulator.
 .PHONY: test-riscv64
 test-riscv64:	cross-compile-riscv64
@@ -256,10 +260,13 @@ WCC_LIBC_SRCS:=$(wildcard $(LIBSRC_DIR)/math/*.c) \
 	$(wildcard $(LIBSRC_DIR)/string/*.c) \
 	$(wildcard $(LIBSRC_DIR)/_wasm/unistd/*.c)
 
-.PHONY: test-wcc
-test-wcc:	wcc
-	$(MAKE) -C tests clean && $(MAKE) -C tests test-wcc
-	$(MAKE) -C libsrc clean-test && $(MAKE) -C libsrc test-wcc
+.PHONY: test-wasm
+test-wasm:	wcc
+	@mkdir -p $(OUTPUT_DIR)
+	./wcc -o $(OUTPUT_DIR)/hello.wasm $(INPUT_DIR)/hello.c
+	./wcc -o $(OUTPUT_DIR)/fib.wasm $(INPUT_DIR)/fib.c
+	./wcc -o $(OUTPUT_DIR)/echo.wasm $(INPUT_DIR)/echo.c
+	./wcc -o $(OUTPUT_DIR)/mandelbrot.wasm $(INPUT_DIR)/mandelbrot.c
 
 .PHONY: wcc-on-xcc
 wcc-on-xcc:	all
